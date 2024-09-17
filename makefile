@@ -2,7 +2,7 @@ CC := gcc
 #SRCS := $(shell find src/ -name "*.s")
 SRCS := src/hello_world.s
 OBJS := $(addprefix bin/, $(SRCS:.s=.o))
-TARGET := bin/out
+TARGET := bin/a.out
 
 .PHONY: all run
 all: $(TARGET)
