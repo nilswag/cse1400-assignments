@@ -1,6 +1,6 @@
 CC := gcc
 #SRCS := $(shell find src/ -name "*.s")
-SRCS := src/hello_world.s
+SRCS := src/power.s
 OBJS := $(addprefix bin/, $(SRCS:.s=.o))
 TARGET := bin/a.out
 
@@ -10,7 +10,7 @@ run: $(TARGET)
 	./$<
 
 $(TARGET): $(OBJS)
-	$(CC) $^ -o $@ -nostdlib
+	$(CC) $^ -o $@
 
 bin/%.o: %.s
 	@mkdir -p $(@D)
