@@ -9,9 +9,9 @@ prompt_base:        .asciz "Enter a non-negative base:\n"
 prompt_exponent:    .asciz "Enter a non-negative exponent:\n"
 output:             .asciz "> %ld\n"
 
-
 .text
 .global main
+
 
 
 main:
@@ -54,6 +54,12 @@ main:
     ret
 
 
+
+# ********************************************************************************************************
+# * Subroutine: scan_int                                                                                 *
+# * Description: Scans user input for integer (converts integer to unsigned if signed)                   *
+# * Returns: Returns user input stored in %rax                                                           *
+# ********************************************************************************************************
 scan_int:
     # prologue
     pushq           %rbp                        # push base pointer to stack
@@ -72,6 +78,13 @@ scan_int:
     ret
 
 
+
+# ********************************************************************************************************
+# * Subroutine: pow                                                                                      *
+# * Description: Calculates base to the power of exponent                                                *
+# * Parameters: %rdi = base, %rsi = exponent                                                             *
+# * Returns: Returns base to the power of exponetn stored in %rax                                        *
+# ********************************************************************************************************
 pow:
     # prologue
     pushq           %rsp                        # push base pointer to stack
