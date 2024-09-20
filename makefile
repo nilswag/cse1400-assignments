@@ -17,6 +17,8 @@ debug: all
 release: ASFLAGS += -Os -s
 release: all
 
+$(shell [ -d bin/ ] || mkdir -p bin/)
+
 all: $(debug) $(TARGET)
 
 # ===========================================================
