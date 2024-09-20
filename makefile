@@ -1,6 +1,6 @@
 CC := gcc
 #SRCS := $(shell find src/ -name "*.s")
-SRCS := src/assignment-1.s
+SRCS := src/assignment-2.s
 OBJS := $(addprefix bin/, $(SRCS:.s=.o))
 TARGET := bin/a.out
 

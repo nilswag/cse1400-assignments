@@ -19,31 +19,31 @@ main:
     pushq           %rbp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
-    movq            $welcome, %rdi              # set $welcome as second parameter for printf
+    movq            $welcome, %rdi              # load $welcome string as first printf parameter
     movq            $0, %rax                    # no vector registers for printf
     call            printf
 
-    subq            $16, %rsp                   # reserve
+    subq            $16, %rsp                   # reserve stack space for getting input from user (16-byte alligned)
 
-    movq            $prompt_base, %rdi          # set $prompt_base as second parameter for printf
-    movq            $0, %rax                    # no vector registers for printf
-    call            printf
-    call            scan_int
-    movq            %rax, -8(%rbp)              # set base
-
-    movq            $prompt_exponent, %rdi      # set $prompt_exponent as second parameter for printf
+    movq            $prompt_base, %rdi          # load $prompt_base string as first printf parameter
     movq            $0, %rax                    # no vector registers for printf
     call            printf
     call            scan_int
-    movq            %rax, -16(%rbp)             # set exponent
+    movq            %rax, -8(%rbp)              # copy the result (base) from scan_int to first half of stack variable
+
+    movq            $prompt_exponent, %rdi      # load $prompt_exponent as first parameter for printf
+    movq            $0, %rax                    # no vector registers for printf
+    call            printf
+    call            scan_int
+    movq            %rax, -16(%rbp)             # copy the result (exponent) from scan_int to second half of stack variable
     
-    movq            -8(%rbp), %rdi              # set base
-    movq            -16(%rbp), %rsi             # set exponent
+    movq            -8(%rbp), %rdi              # load base stack variable as first pow parameter
+    movq            -16(%rbp), %rsi             # laod exponent stack variable as second pow parameter
     call            pow
 
-    movq            $output, %rdi               # set output
-    movq            %rax, %rsi                 
-    movq            $0, %rax
+    movq            $output, %rdi               # load $output string as first printf parameter
+    movq            %rax, %rsi                  # load result from pow as second printf parameter
+    movq            $0, %rax                    # no vector registers for printf
     call            printf
 
     # epilogue
@@ -59,12 +59,12 @@ scan_int:
     pushq           %rbp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
-    subq            $16, %rsp                   # reserve stack space for variable
-    leaq            -16(%rbp), %rsi             # set address of stack variable in %rsi
-    movq            $format_int, %rdi           # set first argument of scanf
+    subq            $16, %rsp                   # reserve stack space for getting input from user (16-byte aligned)
+    movq            $format_int, %rdi           # load $format_int string as first scanf parameter
+    leaq            -16(%rbp), %rsi             # copy stack space address into second scanf parameter
     movq            $0, %rax                    # no vector registers for scanf
     call            scanf
-    movq            %rsi, %rax                  # set input as return value
+    movq            %rsi, %rax                  # set the stack space variable address as return value for pow
 
     # epilogue
     movq            %rbp, %rsp                  # clear local variables from stack
@@ -77,9 +77,9 @@ pow:
     pushq           %rsp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
-    movq            $1, %rax
-    cmpq            $0, %rsi
-    jle             .end   
+    movq            $1, %rax                    # copy $1 into %rax to make sure that if the exponent is 0 that the result will be 1
+    cmpq            $0, %rsi                    # compare $0 and %rsi to check is exponent is 0
+    jle             .end                        # jump to .end if exponent is 0
 
     movq            %rdi, %rax                  # copy base to %rax to be multiplied
 
