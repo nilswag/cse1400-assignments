@@ -25,7 +25,7 @@ main:
 
     subq            $16, %rsp                   # reserve stack space for getting input from user (16-byte alligned)
 
-    movq            $prompt, %rdi          # load $prompt_base string as first printf parameter
+    movq            $prompt, %rdi               # load $prompt_base string as first printf parameter
     movq            $0, %rax                    # no vector registers for printf
     call            printf
     call            scan_int
