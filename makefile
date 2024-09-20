@@ -1,21 +1,36 @@
 CC := gcc
-#SRCS := $(shell find src/ -name "*.s")
-SRCS := src/assignment-2.s
+# SRCS := $(shell find src/ -name "*.s")
+SRCS := src/assignment-1.s
 OBJS := $(addprefix bin/, $(SRCS:.s=.o))
 TARGET := bin/a.out
 
-.PHONY: all run
-all: $(TARGET)
-run: $(TARGET)
-	./$<
+ASFLAGS = -Wall
+LDFLAGS = -no-pie
+
+# ===========================================================
+
+.PHONY: all run debug release
+
+debug: ASFLAGS += -g
+debug: all
+
+release: ASFLAGS += -Os -s
+release: all
+
+all: $(debug) $(TARGET)
+
+# ===========================================================
 
 $(TARGET): $(OBJS)
-	$(CC) $^ -o $@ -no-pie
+	$(CC) $^ -o $@ $(LDFLAGS)
 
 bin/%.o: %.s
-	@mkdir -p $(@D)
-	$(CC) -c $< -o $@ -g
+	@mkdir $(@D)
+	$(CC) -c $< -o $@ $(ASFLAGS)
+
+# ===========================================================
 
 .PHONY: clean
+
 clean:
 	rm -fr bin/src $(TARGET)
