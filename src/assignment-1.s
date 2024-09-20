@@ -10,7 +10,7 @@ prompt_exponent:    .asciz "Enter a non-negative exponent:\n"
 output:             .asciz "> %ld\n"
 
 .text
-.global main
+.global             main
 
 
 
@@ -22,6 +22,7 @@ main:
     movq            $welcome, %rdi              # load $welcome string as first printf parameter
     movq            $0, %rax                    # no vector registers for printf
     call            printf
+
 
     subq            $16, %rsp                   # reserve stack space for getting input from user (16-byte alligned)
 
@@ -46,6 +47,7 @@ main:
     movq            $0, %rax                    # no vector registers for printf
     call            printf
 
+
     # epilogue
     movq            %rbp, %rsp                  # clear local variables from stack
     popq            %rbp                        # restore base pointer location
@@ -65,12 +67,14 @@ scan_int:
     pushq           %rbp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
+
     subq            $16, %rsp                   # reserve stack space for getting input from user (16-byte aligned)
     movq            $format_int, %rdi           # load $format_int string as first scanf parameter
     leaq            -16(%rbp), %rsi             # copy stack space address into second scanf parameter
     movq            $0, %rax                    # no vector registers for scanf
     call            scanf
     movq            %rsi, %rax                  # set the stack space variable address as return value for pow
+
 
     # epilogue
     movq            %rbp, %rsp                  # clear local variables from stack
@@ -90,6 +94,7 @@ pow:
     pushq           %rsp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
+
     movq            $1, %rax                    # copy $1 into %rax to make sure that if the exponent is 0 that the result will be 1
     cmpq            $0, %rsi                    # compare $0 and %rsi to check is exponent is 0
     jle             .end                        # jump to .end if exponent is 0
@@ -105,6 +110,7 @@ pow:
     
     jmp             .loop                       # jump to loop
     .end:
+
 
     # epilogue
     movq            %rbp, %rsp                  # copy base pointer to stack pointer
