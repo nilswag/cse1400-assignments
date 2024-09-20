@@ -1,6 +1,6 @@
 CC := gcc
 #SRCS := $(shell find src/ -name "*.s")
-SRCS := src/power.s
+SRCS := src/assignment-2.s
 OBJS := $(addprefix bin/, $(SRCS:.s=.o))
 TARGET := bin/a.out
 
@@ -10,11 +10,11 @@ run: $(TARGET)
 	./$<
 
 $(TARGET): $(OBJS)
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ -no-pie
 
 bin/%.o: %.s
 	@mkdir -p $(@D)
-	$(CC) -c $< -o $@ -g -no-pie
+	$(CC) -c $< -o $@ -g
 
 .PHONY: clean
 clean:
