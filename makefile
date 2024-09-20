@@ -18,4 +18,4 @@ bin/%.o: %.s
 
 .PHONY: clean
 clean:
-	rm -fr $(OBJS) $(TARGET)
+	rm -fr bin/src $(TARGET)
