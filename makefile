@@ -9,17 +9,19 @@ LDFLAGS = -no-pie
 
 # ===========================================================
 
-.PHONY: all run debug release
+.PHONY: debug release all run
 
 debug: ASFLAGS += -g
-debug: all
+debug: $(TARGET)
 
 release: ASFLAGS += -Os -s
-release: all
+release: $(TARGET)
 
-$(shell [ -d bin/ ] || mkdir -p bin/)
+all: debug
 
-all: $(debug) $(TARGET)
+run: debug
+	./$(TARGET)
+
 
 # ===========================================================
 
@@ -27,7 +29,7 @@ $(TARGET): $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 bin/%.o: %.s
-	@mkdir $(@D)
+	@mkdir -p $(@D)
 	$(CC) -c $< -o $@ $(ASFLAGS)
 
 # ===========================================================
