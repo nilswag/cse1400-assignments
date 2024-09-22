@@ -1,4 +1,4 @@
-# CSE 1400 Assignments
+# CSE1400 Assignments
 
 Welcome to the **CSE1400 Assignments** repository. This is a private repository containing solutions to the programming assignments for the CSE1400 course.
 
