@@ -5,6 +5,8 @@ OBJS := $(addprefix bin/, $(SRCS:.s=.o))
 TARGET := bin/a.out
 
 ASFLAGS = -Wall
+ASFLAGS += -Isrc
+
 LDFLAGS = -no-pie
 
 # ===========================================================

@@ -2,6 +2,7 @@
 # * Assignment 1                                                                                         *
 # * By Daan Geijsen & Nils Wagemaker                                                                     *
 # ********************************************************************************************************
+
 .data
 welcome:            .asciz "\nAssignment 1\n====================\nName: Daan Geijsen\nNetID: dgeijsen\nName: Nils Wagemaker\nNetID: nwagemaker\n====================\n\n"
 format_int:         .asciz "%ld"                # long decimal (64-bit integer)
@@ -11,8 +12,6 @@ output:             .asciz "> %ld\n"
 
 .text
 .global             main
-
-
 
 main:
     # prologue
@@ -56,7 +55,6 @@ main:
     ret
 
 
-
 # ********************************************************************************************************
 # * Subroutine: scan_int                                                                                 *
 # * Description: Scans user input for integer (converts integer to unsigned if signed)                   *
@@ -80,7 +78,6 @@ scan_int:
     movq            %rbp, %rsp                  # clear local variables from stack
     popq            %rbp                        # restore base pointer location
     ret
-
 
 
 # ********************************************************************************************************
