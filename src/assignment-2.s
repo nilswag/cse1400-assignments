@@ -7,7 +7,6 @@
 
 idstr:              .asciz "\nAssignment 2\n====================\nName: Daan Geijsen\nNetID: dgeijsen\nName: Nils Wagemaker\nNetID: nwagemaker\n====================\n\n"
 inputformat:        .asciz "%ld"
-input:              .quad  0   
 
 prompt:             .asciz "> "
 output:             .asciz "> %ld\n"
@@ -31,7 +30,7 @@ main:
     call            printf
     call            scan_int    
 
-    movq            input, %rsi                 # load scanf output as first factorial parameter
+    movq            %rax, %rdi                  # load scanf output as first factorial parameter
     movq            $1, %rax                    # set default %rax value
     call            factorial
 
@@ -52,20 +51,24 @@ main:
 # ********************************************************************************************************
 # * Subroutine: scan_int                                                                                 *
 # * Description: scans user input for integer (converts integer to unsigned if signed)                   *
-# * Returns: seturns user input stored in input stack variable                                           *
+# * Returns: returns user input stored in %rax                                                           *
 # ********************************************************************************************************
 scan_int:
     # prologue
     pushq           %rbp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
+    subq            $16, %rsp                   # allocate memory for scanf
+
     movq            $inputformat, %rdi          # load first scanf parameter
-    movq            $input, %rsi                # load second scanf parameter
+    leaq            -8(%rbp), %rsi              # load second scanf parameter
     movq            $0, %rax                    # no vector registers for scanf
     call            scanf
 
+    movq            -8(%rbp), %rax              # copy scanf return value into %rax
+
     # epilogue
-    movq            %rsp, %rbp                  # clear local variables from stack
+    movq            %rbp, %rsp                  # clear local variables from stack
     popq            %rbp                        # restore base pointer location
     ret
 
@@ -74,7 +77,7 @@ scan_int:
 # ********************************************************************************************************
 # * Subroutine: factorial                                                                                *
 # * Description: calculates factorial of n                                                               *
-# * Parameters: %rsi as n                                                                                *
+# * Parameters: %rdi as n                                                                                *
 # * Returns: factorial of n                                                                              *
 # ********************************************************************************************************
 factorial:
@@ -82,18 +85,18 @@ factorial:
     pushq           %rbp                        # push base pointer to the stack
     movq            %rsp, %rbp                  # copy stack pointer to the base pointer
 
-    cmpq            $1, %rsi                    # compare $1 to %rdx
-    jg              .0                          # if n >= 1 jump to .0
-    jmp             .1                          # else jump to .1
+    cmpq            $1, %rdi                    # compare $1 to %rsi
+    jg              0f                          # if n >= 1 jump to .0
+    jmp             1f                          # else jump to .1
 
-    .0:
-    mulq            %rsi                        # multiply %rax by %rdx
-    decq            %rsi                        # decrement %rdx by one
-    call            factorial
-    .1:
+    0:                                          # if n >= 1
+    mulq            %rdi                        # multiply %rax by %rdi
+    decq            %rdi                        # decrement %rdx by one
+    call            factorial   
+    1:                                          # else
 
     # epilogue
-    movq            %rsp, %rbp                  # clear local variables from stack
+    movq            %rbp, %rsp                  # clear local variables from stack
     popq            %rbp                        # restore base pointer location
     ret
 
