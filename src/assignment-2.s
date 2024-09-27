@@ -5,42 +5,41 @@
 
 .data
 
-idstr:              .asciz "\nAssignment 2\n====================\nName: Daan Geijsen\nNetID: dgeijsen\nName: Nils Wagemaker\nNetID: nwagemaker\n====================\n\n"
-inputformat:        .asciz "%ld"
+id_str:             .asciz "\nAssignment 2\n====================\nName: Daan Geijsen\nNetID: dgeijsen\nName: Nils Wagemaker\nNetID: nwagemaker\n====================\n\n"
+input_format:       .asciz "%ld"
 
-prompt:             .asciz "> "
-output:             .asciz "> %ld\n"
+input_prompt:       .asciz "> "
+output_prompt:      .asciz "> %ld\n"
 
 .text
 
 # ********************************************************************************************************
 
-.global             main
+.global main
 main:
     # prologue
     pushq           %rbp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
-    movq            $idstr, %rdi                # load $welcome string as first printf parameter
+    movq            $id_str, %rdi               # load $welcome string as first printf parameter
     movq            $0, %rax                    # no vector registers for printf
     call            printf
 
-    movq            $prompt, %rdi               # load $prompt string as first printf parameter
+    movq            $input_prompt, %rdi         # load $prompt string as first printf parameter
     movq            $0, %rax                    # no vector registers for printf
     call            printf
-    call            scan_int    
+    call            scan_int
 
-    movq            %rax, %rdi                  # load scanf output as first factorial parameter
-    movq            $1, %rax                    # set default %rax value
+    movq            %rax, %rdi                  # load user input as factorial parameter
     call            factorial
 
-    movq            $output, %rdi               # load $output string as first printf parameter
+    movq            $output_prompt, %rdi        # load $output string as first printf parameter
     movq            %rax, %rsi                  # load factorial output as second printf parameter
     movq            $0, %rax                    # no vector registers for printf
     call            printf
 
     # epilogue
-    movq            %rbp, %rsp                  # clear local variables from stack
+    movq            %rbp, %rsp                  # clear local variables
     popq            %rbp                        # restore base pointer location
     movq            $0, %rdi                    # set 0 as exit code
     call            exit
@@ -60,7 +59,7 @@ scan_int:
 
     subq            $16, %rsp                   # allocate memory for scanf
 
-    movq            $inputformat, %rdi          # load first scanf parameter
+    movq            $input_format, %rdi         # load first scanf parameter
     leaq            -8(%rbp), %rsi              # load second scanf parameter
     movq            $0, %rax                    # no vector registers for scanf
     call            scanf
@@ -82,19 +81,22 @@ scan_int:
 # ********************************************************************************************************
 factorial:
     # prologue
-    pushq           %rbp                        # push base pointer to the stack
-    movq            %rsp, %rbp                  # copy stack pointer to the base pointer
+    pushq           %rbp                        # push base pointer to stack
+    movq            %rsp, %rbp                  # copy stack pointer to base pointer
 
-    cmpq            $1, %rdi                    # compare $1 to %rsi
-    jg              0f                          # if n >= 1 jump to .0
-    jmp             1f                          # else jump to .1
+    cmpq            $1, %rdi                    # compare 1 to n
+    jg              0f                          # if n > 1 jump to recursive step
+    movq            $1, %rax                    # else return 1
+    jmp             1f
+    0:                                          # recursive step
+    subq            $8, %rsp                    # keep stack aligned
+    pushq           %rdi                        # push n to stack
+    decq            %rdi                        # decrement n by one
+    call            factorial
+    popq            %rdi                        # pop n from stack
+    mulq            %rdi                        # multiply %rax by n
 
-    0:                                          # if n >= 1
-    mulq            %rdi                        # multiply %rax by %rdi
-    decq            %rdi                        # decrement %rdx by one
-    call            factorial   
-    1:                                          # else
-
+    1:                                          # end
     # epilogue
     movq            %rbp, %rsp                  # clear local variables from stack
     popq            %rbp                        # restore base pointer location
