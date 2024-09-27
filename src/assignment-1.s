@@ -11,8 +11,8 @@ prompt_exponent:    .asciz "Enter a non-negative exponent:\n"
 output:             .asciz "> %ld\n"
 
 .text
-.global             main
 
+.global             main
 main:
     # prologue
     pushq           %rbp                        # push base pointer to stack
