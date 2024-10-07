@@ -7,7 +7,7 @@ TARGET := bin/a.out
 ASFLAGS = -Wall
 ASFLAGS += -Isrc
 
-LDFLAGS = -no-pie
+LDFLAGS = -no-pie -z noexecstack
 
 # ===========================================================
 
@@ -23,7 +23,6 @@ all: debug
 
 run: debug
 	./$(TARGET)
-
 
 # ===========================================================
 

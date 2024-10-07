@@ -10,7 +10,7 @@ format:             .asciz "%c"
 
 .text
 
-.include            "assignment-3/final.s"
+.include            "final.s"
 
 # ********************************************************************************************************
 
@@ -19,6 +19,10 @@ main:
     # prologue
     pushq           %rbp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
+
+    movq            $id_str, %rdi               # load $welcome string as first printf parameter
+    movq            $0, %rax                    # no vector registers for printf
+    call            printf
 
     movq            $MESSAGE, %rdi              # load $MESSAGE as first decode parameter
     call            decode
@@ -46,7 +50,6 @@ decode:
     movq            %rdi, %rcx
     movq            (%rdi), %rbx              # copy value of value of MESSAGE to %rbx
 
-
     0:                                        # begin for loop (looping through quads)
     
     cmpl            $0, %ebx                  # compare destination block to 0
@@ -65,7 +68,7 @@ decode:
     cmpb            $0, %dl                   # compare 0 to the n-characters counter
     je              2f                        # jump to end of print loop 
 
-    # push callee saved values to stack
+    # pushq callee saved values to stack
     pushq           %rcx
     pushq           %rsi
     pushq           %rdi
@@ -76,7 +79,7 @@ decode:
     movq            $0, %rax                   # no vector registers for printf
     call            printf 
 
-    # pop callee saved values from stack
+    # popq callee saved values from stack
     popq            %rdx
     popq            %rdi
     popq            %rsi
