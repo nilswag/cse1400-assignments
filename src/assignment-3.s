@@ -19,26 +19,17 @@ main:
     # prologue
     pushq           %rbp                        # push base pointer to stack
     movq            %rsp, %rbp                  # copy stack pointer to base pointer
-  
-    movq            $id_str, %rdi               # load $welcome string as first printf parameter
-    movq            $0, %rax                    # no vector registers for printf
-    call            printf
 
-    movq            $MESSAGE, %rdi             # load $MESSAGE as first decode parameter
-    movq            %rdi, %rcx
-
-    pushq           %rbx
+    movq            $MESSAGE, %rdi              # load $MESSAGE as first decode parameter
     call            decode
-    popq            %rbx
 
-    # epilogue
-    movq            %rbp, %rsp                  # clear local variables
-    popq            %rbp                        # restore base pointer location
+    movq            %rbp, %rsp
+    popq            %rbp                        # restore base pointer
     movq            $0, %rdi                    # set 0 as exit code
-    call            exit
+    call            exit                        # call exit
     ret
 
-# ********************************************************************************************************
+# *******************************************************************************************************
 
 # ********************************************************************************************************
 # * Subroutine: decode                                                                                   *
@@ -50,52 +41,62 @@ decode:
     pushq           %rbp                      # push base pointer to stack
     movq            %rsp, %rbp                # copy stack pointer to base pointer
 
+    pushq           %rbx                      # push callee saved register
+
+    movq            %rdi, %rcx
+    movq            (%rdi), %rbx              # copy value of value of MESSAGE to %rbx
+
+
+    0:                                        # begin for loop (looping through quads)
+    
+    cmpl            $0, %ebx                  # compare destination block to 0
+    je              3f                        # jump to end of loop (quad loop)
+
     movq            (%rdi), %rbx              # copy value of value of MESSAGE to %rbx
 
     movb            %bl, %sil                 # copy character byte to %sil
-    andq            $0xFF, %rsi
     shrq            $8, %rbx                  # shift %rbx 1 byte to the right
     movb            %bl, %dl                  # copy n-characters byte to %dl
     shrq            $8, %rbx                  # shift %rbx 1 byte to the right
     andl            $0xFFFFFF, %ebx           # mask byte 2-6 s.t. we remove byte 2
 
-    0:                                        # character printing loop
+    1:                                        # begin for loop (looping through n-characters)   
 
-    cmpb            $0, %dl                   # compare 0 to %dl
-    je              1f                        # if %dl == 0 then end the loop
+    cmpb            $0, %dl                   # compare 0 to the n-characters counter
+    je              2f                        # jump to end of print loop 
 
+    # push callee saved values to stack
     pushq           %rcx
-    pushq           %rdi
     pushq           %rsi
+    pushq           %rdi
     pushq           %rdx
-    subq            $8, %rsp
 
-    movq            $format, %rdi
-    movq            $0, %rax
-    call            printf
+    movq            $format, %rdi              # load format string as first print parameter
+    andq            $0xFF, %rsi                # mask character register
+    movq            $0, %rax                   # no vector registers for printf
+    call            printf 
 
-    addq            $8, %rsp
+    # pop callee saved values from stack
     popq            %rdx
-    popq            %rsi
     popq            %rdi
+    popq            %rsi
     popq            %rcx
 
-    decb            %dl                       # decrement %dl by one
-    jmp             0b
+    decb            %dl                       # decrement n-characters by one
+    jmp             1b                        # jump to start of print loop
 
-    1:                                        # recursive step
-
-    cmpl            $0x0, %ebx                # compare next memory block to 0x0
-    je              2f                        # if block == 0x0 then return    
+    2:                                        # end print loop
 
     leaq            (%rcx, %rbx, 8), %rdi     # calculate memory address of MESSAGES + block * 8 and store it in %rdi
-    call            decode
+    jmp             0b                        # jump to quad loop
 
-    2:
+    3:
 
-    popq            %rbx
+    popq            %rbx                      # pop callee saved register
 
     # epilogue
     movq            %rbp, %rsp                # clear local variables
     popq            %rbp                      # restore base pointer locatio
     ret
+
+# ********************************************************************************************************
